@@ -1,6 +1,7 @@
 const readline = require("readline");
-const newGame = require("./methods/new-game");
+const { createPlayer } = require("./methods/new-game");
 const { questionAsync } = require("./shared/utils");
+const { createMap } = require("./methods/map");
 
 const readlineProccess = readline.createInterface({
   input: process.stdin,
@@ -26,16 +27,11 @@ function showMenu(retry) {
 async function selectMenuOption(opcion) {
   switch (opcion) {
     case "1":
-      const response = await newGame(readlineProccess);
-
-      if (response) {
-        readlineProccess.close();
-        process.exit(0);
-      }
+      await createPlayer(readlineProccess);
 
       return true;
     case "2":
-      console.log("Ha seleccionado la Opción 2");
+      createMap();
 
       return true;
     case "3":
@@ -52,6 +48,7 @@ async function selectMenuOption(opcion) {
 }
 
 async function initGame(retry) {
+  console.clear();
   showMenu(retry);
 
   const selectedOption = await questionAsync(readlineProccess);

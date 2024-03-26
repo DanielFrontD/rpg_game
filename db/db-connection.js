@@ -10,6 +10,9 @@ connection.connect((error) => {
     console.error("Error on connect DB", error);
     return;
   }
+
+  console.error("DB connected", error);
+
 });
 
 module.exports = {

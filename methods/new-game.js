@@ -1,8 +1,10 @@
 const { questionAsync } = require("../shared/utils");
-const { createUser, getCharacters, saveUserCharacter } = require("./db-utils");
+const { createUser, getCharacters, saveUserCharacter } = require("../db/db-utils");
 
-module.exports = (readlineProccess) =>
+const createPlayer = (readlineProccess) =>
   new Promise(async (resolve, reject) => {
+    console.clear();
+
     try {
       console.log(`Cual sera tu nombre?`);
 
@@ -26,6 +28,7 @@ module.exports = (readlineProccess) =>
       const selectedCharacter = characters[index];
 
       if (selectedCharacter) {
+        console.clear();
         console.log(`Tu personaje es un ${selectedCharacter.character_name}`);
 
         const savedUserCharacter = await saveUserCharacter(
@@ -41,3 +44,5 @@ module.exports = (readlineProccess) =>
       reject(error);
     }
   });
+
+module.exports = { createPlayer };
