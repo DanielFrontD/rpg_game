@@ -1,0 +1,15 @@
+{
+  "name": "rpg_game",
+  "version": "1.0.0",
+  "description": "rol game practice",
+  "main": "init.js",
+  "scripts": {
+    "dev": "node init.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "mysql": "^2.18.1"
+  }
+}
