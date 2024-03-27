@@ -1,7 +1,7 @@
 const readline = require("readline");
 const { createPlayer } = require("./methods/new-game");
 const { questionAsync } = require("./shared/utils");
-const { createMap } = require("./methods/map");
+const { createMap } = require("./methods/draw-map");
 
 const readlineProccess = readline.createInterface({
   input: process.stdin,

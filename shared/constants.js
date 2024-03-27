@@ -1,10 +1,13 @@
 module.exports = {
   DAMAGE_PERCENTAGE: 0.3,
   DEFAULT_USER_INDICATOR: '>>>>',
+  NOT_AVAILABLE_SPACE: '~',
+  STARTING_POINT: 'X',
   VERTICAL_WALL: '║',
   HORIZONTAL_WALL: '═',
   TOP_LEFT_WALL: '╔',
   TOP_RIGHT_WALL: '╗',
   BOTTOM_RIGHT_WALL: '╝',
   BOTTOM_LEFT_WALL: '╚',
+  ELF: '🧝',
 }
