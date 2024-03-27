@@ -1,4 +1,5 @@
 module.exports = {
+  DAMAGE_PERCENTAGE: 0.3,
   DEFAULT_USER_INDICATOR: '>>>>',
   VERTICAL_WALL: '║',
   HORIZONTAL_WALL: '═',

@@ -17,14 +17,6 @@ const player = "🧝";
 let x = 1;
 let y = 1;
 
-function replaceAt(value, index, replacement) {
-  return (
-    value.substring(0, index) +
-    replacement +
-    value.substring(index + replacement.length)
-  );
-}
-
 function printMap() {
   for (let row = 0; row < rows; row++) {
     let line = "";
