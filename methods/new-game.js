@@ -1,48 +1,25 @@
-const { questionAsync } = require("../shared/utils");
-const { createUser, getCharacters, saveUserCharacter } = require("../db/db-utils");
+const { createPlayer } = require("./create-player");
+const { Player } = require("../classes/player");
+const { createMap } = require("./draw-map");
 
-const createPlayer = (readlineProccess) =>
-  new Promise(async (resolve, reject) => {
-    console.clear();
+async function newGame(readlineProccess) {
+  const playerData = await createPlayer(readlineProccess);
+  const newPlayer = new Player(playerData[0]);
 
-    try {
-      console.log(`Cual sera tu nombre?`);
+  console.log(
+    `Eres un ${newPlayer.characterClass}, y por algún motivo desconocido apareciste en un cuarto vacío.`
+  );
+  console.log("Solo te queda buscar la salida cueste lo que cueste!");
+  console.log("");
+  console.log("Presiona cualquier tecla para empezar");
 
-      const nameResponse = await questionAsync(readlineProccess);
-      const currentUser = await createUser(nameResponse);
+  function startGame() {
+    createMap(newPlayer.lastMap);
 
-      console.log(`${nameResponse}! Tu aventura ya casi comienza.`);
-      console.log("Escoge tu personaje!");
+    readlineProccess.input.removeListener("keypress", startGame);
+  }
 
-      const characters = await getCharacters();
+  readlineProccess.input.on("keypress", startGame);
+}
 
-      characters.map((character, index) => {
-        console.log(`${index + 1}: ${character.character_name}:`);
-        console.log(
-          `   ACT ${character.character_attack} MAG ${character.character_magic} HP ${character.character_healt_points} MP ${character.character_magic_points}`
-        );
-      });
-
-      const characterNumber = await questionAsync(readlineProccess);
-      const index = characterNumber - 1;
-      const selectedCharacter = characters[index];
-
-      if (selectedCharacter) {
-        console.clear();
-        console.log(`Tu personaje es un ${selectedCharacter.character_name}`);
-
-        const savedUserCharacter = await saveUserCharacter(
-          currentUser.insertId,
-          selectedCharacter.character_id
-        );
-
-        if (savedUserCharacter) {
-          resolve(true);
-        }
-      }
-    } catch (error) {
-      reject(error);
-    }
-  });
-
-module.exports = { createPlayer };
+module.exports = { newGame };

@@ -3,13 +3,8 @@ const { DAMAGE_PERCENTAGE } = require("../shared/constants");
 const _private = new WeakMap();
 
 class Player {
-  constructor(userName, characterClass, level, stats) {
-    _private.set(this, {
-      userName,
-      characterClass,
-      level,
-      stats,
-    });
+  constructor(playerdata) {
+    _private.set(this, playerdata);
   }
 
   get userName() {
@@ -24,8 +19,24 @@ class Player {
     return _private.get(this).level;
   }
 
-  get stats() {
-    return _private.get(this).stats;
+  get attack() {
+    return _private.get(this).attack;
+  }
+
+  get magic() {
+    return _private.get(this).magic;
+  }
+
+  get hp() {
+    return _private.get(this).hp;
+  }
+
+  get lastPosition() {
+    return _private.get(this).lastPosition;
+  }
+
+  get lastMap() {
+    return _private.get(this).lastMap;
   }
 
   setLevelUp() {
@@ -37,8 +48,8 @@ class Player {
     const currentLevel = this.level;
     const attackPerLevel = currentAttack * DAMAGE_PERCENTAGE;
 
-    return currentAttack + (attackPerLevel * currentLevel)
+    return currentAttack + attackPerLevel * currentLevel;
   }
 }
 
-module.exports = { Player }
+module.exports = { Player };

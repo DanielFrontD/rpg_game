@@ -1,7 +1,6 @@
 const readline = require("readline");
-const { createPlayer } = require("./methods/new-game");
 const { questionAsync } = require("./shared/utils");
-const { createMap } = require("./methods/draw-map");
+const { newGame } = require("./methods/new-game");
 
 const readlineProccess = readline.createInterface({
   input: process.stdin,
@@ -11,7 +10,6 @@ const readlineProccess = readline.createInterface({
 function listOptions() {
   console.log("1. Nuevo Juego");
   console.log("2. Continuar");
-  console.log("3. Opciones");
 }
 
 function showMenu(retry) {
@@ -27,16 +25,10 @@ function showMenu(retry) {
 async function selectMenuOption(opcion) {
   switch (opcion) {
     case "1":
-      await createPlayer(readlineProccess);
+      newGame(readlineProccess);
 
       return true;
     case "2":
-      createMap();
-
-      return true;
-    case "3":
-      console.log("Ha seleccionado la Opción 3");
-
       return true;
     default:
       console.log("Opción inválida. Por favor, seleccione una opción válida.");

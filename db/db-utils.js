@@ -33,8 +33,8 @@ async function getCharacters() {
 async function saveUserCharacter(userId, characterId) {
   try {
     const createdUser = await asyncRequest(
-      "INSERT INTO users_characters (users_characters_user_id, users_characters_character_id, users_characters_level) VALUES (?, ?, ?)",
-      [userId, characterId, 1]
+      "INSERT INTO players (player_user_id, player_character_id, player_level, player_last_map) VALUES (?, ?, ?, ?)",
+      [userId, characterId, 1, 1]
     );
 
     return createdUser;
@@ -45,4 +45,36 @@ async function saveUserCharacter(userId, characterId) {
   }
 }
 
-module.exports = { createUser, getCharacters, saveUserCharacter };
+async function getFullPlayerData(playerId) {
+  try {
+    const createdUser = await asyncRequest(
+      `SELECT u.user_name AS userName,
+      c.character_name AS characterClass,
+      c.character_attack AS attack,
+      c.character_magic AS magic,
+      c.character_healt_points AS hp,
+      c.character_magic_points AS mp,
+      pl.player_last_position AS lastPosition,
+      pl.player_last_map AS lastMap,
+      pl.player_level AS level
+      FROM users AS u
+      JOIN players AS pl ON u.user_id = pl.player_user_id
+      JOIN characters AS c ON pl.player_character_id = c.character_id
+      WHERE pl.player_id = ?`,
+      [playerId]
+    );
+
+    return createdUser;
+  } catch (error) {
+    console.error("Error on create the user", error);
+
+    throw error;
+  }
+}
+
+module.exports = {
+  createUser,
+  getCharacters,
+  saveUserCharacter,
+  getFullPlayerData,
+};
