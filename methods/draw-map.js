@@ -8,6 +8,7 @@ const {
   COLORS,
 } = require("../shared/constants");
 const maps = require("../maps");
+const stories = require("../maps/stories");
 const { updatePlayerMap } = require("../db/db-utils");
 
 let currentPlayerPosition = [null, null];
@@ -16,6 +17,8 @@ let currentMap = null;
 let currentMapIndex = 0;
 let keyboardHandler = null;
 let currentPlayerId = null;
+let mapTransitioned = false;
+const visitedMaps = new Set();
 
 function printMap(mapIndex) {
   const rows = maps[mapIndex];
@@ -77,6 +80,20 @@ function printMap(mapIndex) {
   }
 }
 
+function printStory(mapIndex) {
+  const story = stories[mapIndex];
+  if (!story) return;
+
+  console.log("");
+
+  if (!visitedMaps.has(mapIndex)) {
+    console.log(story.firstVisit);
+    visitedMaps.add(mapIndex);
+  } else {
+    console.log(story.revisit);
+  }
+}
+
 function isExit(yPosition, xPosition) {
   const tile = currentMap[yPosition] && currentMap[yPosition][xPosition];
   return tile === EXIT_FORWARD || tile === EXIT_BACKWARD;
@@ -111,6 +128,8 @@ function handleExit(yPosition, xPosition) {
 
       console.clear();
       printMap(currentMapIndex);
+      printStory(currentMapIndex);
+      mapTransitioned = true;
       return true;
     }
   }
@@ -140,6 +159,8 @@ function handleExit(yPosition, xPosition) {
 
       console.clear();
       printMap(currentMapIndex);
+      printStory(currentMapIndex);
+      mapTransitioned = true;
       return true;
     }
   }
@@ -240,8 +261,12 @@ function handleKeyboard(mapIndex) {
 
     movePlayer(data.name);
 
-    console.clear();
-    printMap(currentMapIndex);
+    if (!mapTransitioned) {
+      console.clear();
+      printMap(currentMapIndex);
+      printStory(currentMapIndex);
+    }
+    mapTransitioned = false;
   });
 
   readlineProccess.prompt();
@@ -270,6 +295,7 @@ function createMap(mapLevel = 0, playerId = null, lastPosition = 0) {
 
   console.clear();
   printMap(mapIndex);
+  printStory(mapIndex);
   handleKeyboard(mapIndex);
 }
 

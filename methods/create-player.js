@@ -12,6 +12,12 @@ async function askForName(readlineProccess) {
 
   const nameResponse = await questionAsync(readlineProccess);
 
+  if (!nameResponse.trim()) {
+    console.log(`${COLORS.RED}El nombre no puede estar vacío.${COLORS.RESET}`);
+    console.log("");
+    return askForName(readlineProccess);
+  }
+
   try {
     const currentUser = await createUser(nameResponse);
     return { name: nameResponse, user: currentUser };
