@@ -8,12 +8,14 @@ const {
   COLORS,
 } = require("../shared/constants");
 const maps = require("../maps");
+const { updatePlayerMap } = require("../db/db-utils");
 
 let currentPlayerPosition = [null, null];
 let playerStarted = false;
 let currentMap = null;
 let currentMapIndex = 0;
 let keyboardHandler = null;
+let currentPlayerId = null;
 
 function printMap(mapIndex) {
   const rows = maps[mapIndex];
@@ -91,7 +93,6 @@ function handleExit(yPosition, xPosition) {
       playerStarted = false;
       currentPlayerPosition = [null, null];
 
-      // Buscar el EXIT_BACKWARD (<) en el nuevo mapa para posicionar al jugador
       const newMap = maps[currentMapIndex];
       for (let r = 0; r < newMap.length; r++) {
         for (let c = 0; c < newMap[r].length; c++) {
@@ -102,6 +103,10 @@ function handleExit(yPosition, xPosition) {
           }
         }
         if (currentPlayerPosition[0] !== null) break;
+      }
+
+      if (currentPlayerId) {
+        updatePlayerMap(currentPlayerId, currentMapIndex + 1, 0);
       }
 
       console.clear();
@@ -117,7 +122,6 @@ function handleExit(yPosition, xPosition) {
       currentMapIndex = prevMapIndex;
       playerStarted = true;
 
-      // Buscar el EXIT_FORWARD (>) en el mapa anterior para posicionar al jugador
       const newMap = maps[currentMapIndex];
       currentPlayerPosition = [null, null];
       for (let r = 0; r < newMap.length; r++) {
@@ -128,6 +132,10 @@ function handleExit(yPosition, xPosition) {
           }
         }
         if (currentPlayerPosition[0] !== null) break;
+      }
+
+      if (currentPlayerId) {
+        updatePlayerMap(currentPlayerId, currentMapIndex + 1, 1);
       }
 
       console.clear();
@@ -239,9 +247,26 @@ function handleKeyboard(mapIndex) {
   readlineProccess.prompt();
 }
 
-function createMap(mapLevel = 0) {
+function createMap(mapLevel = 0, playerId = null, lastPosition = 0) {
   const mapIndex = mapLevel > 0 ? mapLevel - 1 : 0;
   currentMapIndex = mapIndex;
+  currentPlayerId = playerId;
+
+  const map = maps[mapIndex];
+  const targetTile = Number(lastPosition) === 1 ? EXIT_FORWARD : (mapIndex === 0 ? STARTING_POINT : EXIT_BACKWARD);
+
+  currentPlayerPosition = [null, null];
+  playerStarted = mapIndex > 0 || Number(lastPosition) === 1;
+
+  for (let r = 0; r < map.length; r++) {
+    for (let c = 0; c < map[r].length; c++) {
+      if (map[r][c] === targetTile) {
+        currentPlayerPosition = [r, c];
+        break;
+      }
+    }
+    if (currentPlayerPosition[0] !== null) break;
+  }
 
   console.clear();
   printMap(mapIndex);

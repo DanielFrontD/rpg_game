@@ -7,6 +7,10 @@ class Player {
     _private.set(this, playerdata);
   }
 
+  get playerId() {
+    return _private.get(this).playerId;
+  }
+
   get userName() {
     return _private.get(this).userName;
   }

@@ -39,7 +39,8 @@ async function saveUserCharacter(userId, characterId) {
 async function getFullPlayerData(playerId) {
   try {
     const createdUser = await db.query(
-      `SELECT u.user_name AS userName,
+      `SELECT pl.player_id AS playerId,
+      u.user_name AS userName,
       c.character_name AS characterClass,
       c.character_attack AS attack,
       c.character_magic AS magic,
@@ -77,10 +78,18 @@ async function getPlayers() {
   return players;
 }
 
+async function updatePlayerMap(playerId, mapNumber, lastPosition) {
+  await db.query(
+    "UPDATE players SET player_last_map = ?, player_last_position = ? WHERE player_id = ?",
+    [mapNumber, lastPosition, playerId]
+  );
+}
+
 module.exports = {
   createUser,
   getCharacters,
   saveUserCharacter,
   getFullPlayerData,
   getPlayers,
+  updatePlayerMap,
 };

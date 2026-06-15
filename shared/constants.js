@@ -13,7 +13,6 @@ module.exports = {
   BOTTOM_LEFT_WALL: '╚',
   ELF: '🧝',
 
-  // Colores ANSI
   COLORS: {
     RESET: '\x1b[0m',
     RED: '\x1b[31m',

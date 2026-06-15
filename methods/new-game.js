@@ -15,7 +15,7 @@ async function newGame(readlineProccess) {
   console.log(`${COLORS.CYAN}Presiona cualquier tecla para empezar${COLORS.RESET}`);
 
   function startGame() {
-    createMap(newPlayer.lastMap);
+    createMap(newPlayer.lastMap, newPlayer.playerId, newPlayer.lastPosition || 0);
 
     readlineProccess.input.removeListener("keypress", startGame);
   }

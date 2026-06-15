@@ -44,7 +44,7 @@ async function continueGame(readlineProccess) {
   console.log(`${COLORS.CYAN}Presiona cualquier tecla para continuar${COLORS.RESET}`);
 
   function startGame() {
-    createMap(player.lastMap);
+    createMap(player.lastMap, player.playerId, player.lastPosition || 0);
     readlineProccess.input.removeListener("keypress", startGame);
   }
 
