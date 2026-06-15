@@ -3,6 +3,8 @@ module.exports = {
   DEFAULT_USER_INDICATOR: '>>>>',
   NOT_AVAILABLE_SPACE: '~',
   STARTING_POINT: 'X',
+  EXIT_FORWARD: '>',
+  EXIT_BACKWARD: '<',
   VERTICAL_WALL: '║',
   HORIZONTAL_WALL: '═',
   TOP_LEFT_WALL: '╔',
