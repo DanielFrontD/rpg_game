@@ -3,6 +3,7 @@ const connection = mysql.createConnection({
   host: "localhost",
   user: "root",
   password: "root",
+  database: "rpg_game_db",
 });
 
 connection.connect((error) => {
@@ -13,9 +14,15 @@ connection.connect((error) => {
 });
 
 module.exports = {
-  query: async (sql, valores, callback) => {
-    await connection.query('USE rpg_game_db');
-
-    return connection.query(sql, valores, callback);
+  query: (sql, valores) => {
+    return new Promise((resolve, reject) => {
+      connection.query(sql, valores, (error, results) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(results);
+        }
+      });
+    });
   },
 };

@@ -1,26 +1,17 @@
 const db = require("./db-connection");
-const { promisify } = require("util");
-
-const asyncRequest = promisify(db.query).bind(db);
 
 async function createUser(name) {
-  try {
-    const createdUser = await asyncRequest(
-      "INSERT INTO users (user_name) VALUES (?)",
-      [name]
-    );
+  const createdUser = await db.query(
+    "INSERT INTO users (user_name) VALUES (?)",
+    [name]
+  );
 
-    return createdUser;
-  } catch (error) {
-    console.error("Error on create the user", error);
-
-    throw error;
-  }
+  return createdUser;
 }
 
 async function getCharacters() {
   try {
-    const characters = await asyncRequest("SELECT * FROM characters");
+    const characters = await db.query("SELECT * FROM characters");
 
     return characters;
   } catch (error) {
@@ -32,7 +23,7 @@ async function getCharacters() {
 
 async function saveUserCharacter(userId, characterId) {
   try {
-    const createdUser = await asyncRequest(
+    const createdUser = await db.query(
       "INSERT INTO players (player_user_id, player_character_id, player_level, player_last_map) VALUES (?, ?, ?, ?)",
       [userId, characterId, 1, 1]
     );
@@ -47,7 +38,7 @@ async function saveUserCharacter(userId, characterId) {
 
 async function getFullPlayerData(playerId) {
   try {
-    const createdUser = await asyncRequest(
+    const createdUser = await db.query(
       `SELECT u.user_name AS userName,
       c.character_name AS characterClass,
       c.character_attack AS attack,
@@ -72,9 +63,24 @@ async function getFullPlayerData(playerId) {
   }
 }
 
+async function getPlayers() {
+  const players = await db.query(
+    `SELECT pl.player_id AS playerId,
+    u.user_name AS userName,
+    c.character_name AS characterClass,
+    pl.player_level AS level
+    FROM players AS pl
+    JOIN users AS u ON pl.player_user_id = u.user_id
+    JOIN characters AS c ON pl.player_character_id = c.character_id`
+  );
+
+  return players;
+}
+
 module.exports = {
   createUser,
   getCharacters,
   saveUserCharacter,
   getFullPlayerData,
+  getPlayers,
 };

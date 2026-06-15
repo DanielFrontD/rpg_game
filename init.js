@@ -1,6 +1,8 @@
 const readline = require("readline");
 const { questionAsync } = require("./shared/utils");
 const { newGame } = require("./methods/new-game");
+const { continueGame } = require("./methods/continue-game");
+const { COLORS } = require("./shared/constants");
 
 const readlineProccess = readline.createInterface({
   input: process.stdin,
@@ -8,14 +10,14 @@ const readlineProccess = readline.createInterface({
 });
 
 function listOptions() {
-  console.log("1. Nuevo Juego");
-  console.log("2. Continuar");
+  console.log(`${COLORS.CYAN}1.${COLORS.RESET} Nuevo Juego`);
+  console.log(`${COLORS.CYAN}2.${COLORS.RESET} Continuar`);
 }
 
 function showMenu(retry) {
   const headText = retry
-    ? "Vuelve a intentarlo:"
-    : "Bienvenido al Final Fantasy con presupuesto 0! Seleccione una opción:";
+    ? `${COLORS.YELLOW}Vuelve a intentarlo:${COLORS.RESET}`
+    : `${COLORS.GREEN}Bienvenido al Final Fantasy con presupuesto 0!${COLORS.RESET} Seleccione una opción:`;
 
   console.log(headText);
 
@@ -29,9 +31,11 @@ async function selectMenuOption(opcion) {
 
       return true;
     case "2":
+      continueGame(readlineProccess);
+
       return true;
     default:
-      console.log("Opción inválida. Por favor, seleccione una opción válida.");
+      console.log(`${COLORS.RED}Opción inválida. Por favor, seleccione una opción válida.${COLORS.RESET}`);
 
       initGame(true);
 

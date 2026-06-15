@@ -58,8 +58,6 @@ function movePlayer(nextMove) {
   const rightLimits = currentMap[0].length;
   const bottomLimits = currentMap.length - 1;
 
-  console.log({ rightLimits })
-
   switch (nextMove) {
     case "up": {
       const xPosition = currentPlayerPosition[1];
@@ -142,9 +140,11 @@ async function handleKeyboard(mapLevel) {
 }
 
 function createMap(mapLevel = 0) {
+  const mapIndex = mapLevel > 0 ? mapLevel - 1 : 0;
+
   console.clear();
-  printMap(mapLevel);
-  handleKeyboard(mapLevel);
+  printMap(mapIndex);
+  handleKeyboard(mapIndex);
 }
 
 module.exports = { createMap };
