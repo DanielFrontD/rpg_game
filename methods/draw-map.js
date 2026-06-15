@@ -1,5 +1,5 @@
 const readline = require("readline");
-const { STARTING_POINT, ELF } = require("../shared/constants");
+const { STARTING_POINT, ELF, NOT_AVAILABLE_SPACE, COLORS } = require("../shared/constants");
 const maps = require("../maps");
 
 let currentPlayerPosition = [null, null];
@@ -38,7 +38,11 @@ function printMap(mapLevel) {
         }
 
         default:
-          line += currentColumn;
+          if (currentColumn === NOT_AVAILABLE_SPACE) {
+            line += `${COLORS.BLUE}${currentColumn}${COLORS.RESET}`;
+          } else {
+            line += currentColumn;
+          }
       }
     }
 
@@ -89,7 +93,7 @@ function movePlayer(nextMove) {
       const xPosition = currentPlayerPosition[1];
       const yPosition = currentPlayerPosition[0] + 1;
 
-      if (yPosition === bottomLimits || nextSpotIsObstacle(yPosition, xPosition)) {
+      if (yPosition >= currentMap.length || nextSpotIsObstacle(yPosition, xPosition)) {
         return;
       }
 
