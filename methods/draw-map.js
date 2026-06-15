@@ -5,11 +5,14 @@ const {
   NOT_AVAILABLE_SPACE,
   EXIT_FORWARD,
   EXIT_BACKWARD,
+  MONSTER,
+  WOMAN,
   COLORS,
 } = require("../shared/constants");
 const maps = require("../maps");
 const stories = require("../maps/stories");
 const { updatePlayerMap } = require("../db/db-utils");
+const { startCombat } = require("./combat");
 
 let currentPlayerPosition = [null, null];
 let playerStarted = false;
@@ -18,7 +21,11 @@ let currentMapIndex = 0;
 let keyboardHandler = null;
 let currentPlayerId = null;
 let mapTransitioned = false;
+let inCombat = false;
+let combatPosition = null;
+let currentPlayer = null;
 const visitedMaps = new Set();
+const defeatedEnemies = new Map();
 
 function printMap(mapIndex) {
   const rows = maps[mapIndex];
@@ -64,6 +71,23 @@ function printMap(mapIndex) {
 
         case currentColumn === EXIT_BACKWARD: {
           line += " ";
+          break;
+        }
+
+        case currentColumn === "M": {
+          const enemyKey = `${currentMapIndex}-${row}-${column}`;
+          if (defeatedEnemies.has(enemyKey)) {
+            line += " ";
+          } else {
+            line += MONSTER;
+            skipNext = true;
+          }
+          break;
+        }
+
+        case currentColumn === "W": {
+          line += WOMAN;
+          skipNext = true;
           break;
         }
 
@@ -170,8 +194,42 @@ function handleExit(yPosition, xPosition) {
 
 const nextSpotIsObstacle = (yPosition, xPosition) => {
   const tile = currentMap[yPosition] && currentMap[yPosition][xPosition];
+  if (tile === "M") {
+    const key = `${currentMapIndex}-${yPosition}-${xPosition}`;
+    return !defeatedEnemies.has(key);
+  }
   return tile !== " " && tile !== EXIT_FORWARD && tile !== EXIT_BACKWARD;
 };
+
+function isEnemy(yPosition, xPosition) {
+  const tile = currentMap[yPosition] && currentMap[yPosition][xPosition];
+  if (tile !== "M") return false;
+  const key = `${currentMapIndex}-${yPosition}-${xPosition}`;
+  return !defeatedEnemies.has(key);
+}
+
+function checkAdjacentEnemy() {
+  const [py, px] = currentPlayerPosition;
+  const directions = [
+    [py - 1, px],
+    [py + 1, px],
+    [py, px - 1],
+    [py, px + 1],
+    [py, px + 2],
+    [py - 1, px + 1],
+    [py + 1, px + 1],
+  ];
+
+  for (const [y, x] of directions) {
+    if (y >= 0 && y < currentMap.length && x >= 0 && x < currentMap[0].length) {
+      if (isEnemy(y, x)) {
+        return { y, x };
+      }
+    }
+  }
+
+  return null;
+}
 
 function movePlayer(nextMove) {
   playerStarted = true;
@@ -242,6 +300,43 @@ function movePlayer(nextMove) {
     default:
       return;
   }
+
+  const enemy = checkAdjacentEnemy();
+  if (enemy) {
+    return { combat: true, enemy };
+  }
+
+  return { combat: false };
+}
+
+function initCombat(enemyY, enemyX) {
+  inCombat = true;
+  combatPosition = [...currentPlayerPosition];
+
+  if (keyboardHandler) {
+    keyboardHandler.input.setRawMode(false);
+    keyboardHandler.input.removeAllListeners("keypress");
+    keyboardHandler.close();
+    keyboardHandler = null;
+  }
+
+  const enemyTile = { y: enemyY, x: enemyX };
+
+  startCombat(currentPlayer, enemyTile, (result, enemy) => {
+    inCombat = false;
+
+    if (result === "win") {
+      const key = `${currentMapIndex}-${enemy.y}-${enemy.x}`;
+      defeatedEnemies.set(key, true);
+    }
+
+    currentPlayerPosition = combatPosition;
+
+    console.clear();
+    printMap(currentMapIndex);
+    printStory(currentMapIndex);
+    handleKeyboard(currentMapIndex);
+  });
 }
 
 function handleKeyboard(mapIndex) {
@@ -259,9 +354,13 @@ function handleKeyboard(mapIndex) {
       process.exit();
     }
 
-    movePlayer(data.name);
+    const result = movePlayer(data.name);
 
     if (!mapTransitioned) {
+      if (result && result.combat) {
+        initCombat(result.enemy.y, result.enemy.x);
+        return;
+      }
       console.clear();
       printMap(currentMapIndex);
       printStory(currentMapIndex);
@@ -272,10 +371,11 @@ function handleKeyboard(mapIndex) {
   readlineProccess.prompt();
 }
 
-function createMap(mapLevel = 0, playerId = null, lastPosition = 0) {
+function createMap(mapLevel = 0, playerId = null, lastPosition = 0, player = null) {
   const mapIndex = mapLevel > 0 ? mapLevel - 1 : 0;
   currentMapIndex = mapIndex;
   currentPlayerId = playerId;
+  currentPlayer = player;
 
   const map = maps[mapIndex];
   const targetTile = Number(lastPosition) === 1 ? EXIT_FORWARD : (mapIndex === 0 ? STARTING_POINT : EXIT_BACKWARD);

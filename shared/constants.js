@@ -12,6 +12,8 @@ module.exports = {
   BOTTOM_RIGHT_WALL: '╝',
   BOTTOM_LEFT_WALL: '╚',
   ELF: '🧝',
+  MONSTER: '👹',
+  WOMAN: '👩',
 
   COLORS: {
     RESET: '\x1b[0m',
